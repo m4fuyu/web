@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 中国古代建筑成就</title>
+    <meta name="description" content="注册中国古代建筑成就网站账号，开启建筑文化探索之旅">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <!-- 页面头部 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="index.html">中国古代建筑成就</a></h1>
+                </div>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li class="nav-item"><a href="index.html" class="nav-link">首页</a></li>
+                        <li class="nav-item"><a href="index.html#minju" class="nav-link">民居</a></li>
+                        <li class="nav-item"><a href="index.html#guanfu" class="nav-link">官府</a></li>
+                        <li class="nav-item"><a href="index.html#huanggong" class="nav-link">皇宫</a></li>
+                        <li class="nav-item"><a href="index.html#qiaoliang" class="nav-link">桥梁</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="main">
+        <div class="container">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h2>用户注册</h2>
+                        <p>创建账号，探索中国古代建筑文化</p>
+                    </div>
+
+                    <form id="registerForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="username">用户名 *</label>
+                            <input type="text" id="username" name="username"
+                                   placeholder="6-18位字母、数字或下划线，以字母开头" required
+                                   pattern="^[a-zA-Z][a-zA-Z0-9_]{5,17}$"
+                                   title="用户名必须是6-18位字母、数字或下划线，且以字母开头">
+                            <span class="form-error" id="usernameError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">密码 *</label>
+                            <input type="password" id="password" name="password"
+                                   placeholder="至少6位字符" required
+                                   minlength="6">
+                            <span class="form-error" id="passwordError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword">确认密码 *</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword"
+                                   placeholder="请再次输入密码" required
+                                   minlength="6">
+                            <span class="form-error" id="confirmPasswordError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="realName">真实姓名</label>
+                            <input type="text" id="realName" name="realName"
+                                   placeholder="请输入真实姓名">
+                            <span class="form-error" id="realNameError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gender">性别</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="gender" value="男" checked>
+                                    <span class="radio-checkmark"></span>
+                                    男
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="gender" value="女">
+                                    <span class="radio-checkmark"></span>
+                                    女
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="gender" value="保密">
+                                    <span class="radio-checkmark"></span>
+                                    保密
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">邮箱</label>
+                            <input type="email" id="email" name="email"
+                                   placeholder="请输入邮箱地址">
+                            <span class="form-error" id="emailError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="agree" name="agree" required>
+                                <span class="checkmark"></span>
+                                我已阅读并同意<a href="#" class="terms-link">用户协议</a>和<a href="#" class="privacy-link">隐私政策</a>
+                            </label>
+                            <span class="form-error" id="agreeError"></span>
+                        </div>
+
+                        <button type="submit" class="auth-btn" id="registerBtn">
+                            <span class="btn-text">注册</span>
+                            <span class="btn-loading" style="display: none;">注册中...</span>
+                        </button>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p>已有账号？<a href="login.html">立即登录</a></p>
+                        <p><a href="admin/index.html">管理员登录</a></p>
+                    </div>
+                </div>
+
+                <div class="auth-info">
+                    <div class="info-content">
+                        <h3>注册会员权益</h3>
+                        <p>加入我们，您可以享受：</p>
+                        <ul>
+                            <li>✓ 浏览完整的建筑资料库</li>
+                            <li>✓ 收藏喜爱的建筑作品</li>
+                            <li>✓ 发表专业评论和见解</li>
+                            <li>✓ 参与建筑文化讨论</li>
+                            <li>✓ 获取个性化内容推荐</li>
+                            <li>✓ 下载高清建筑图片</li>
+                            <li>✓ 参与线下建筑参观活动</li>
+                        </ul>
+                        <div class="info-image">
+                            <img src="images/ui/register-benefit.png" alt="注册权益">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页面底部 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>关于我们</h3>
+                    <p>本网站致力于展示中国古代建筑的辉煌成就，传承和弘扬中华优秀传统文化。</p>
+                </div>
+                <div class="footer-section">
+                    <h3>建筑分类</h3>
+                    <ul>
+                        <li><a href="index.html?category=民居">传统民居</a></li>
+                        <li><a href="index.html?category=官府">古代官府</a></li>
+                        <li><a href="index.html?category=皇宫">皇宫建筑</a></li>
+                        <li><a href="index.html?category=桥梁">古代桥梁</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 中国古代建筑成就. 版权所有.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript文件 -->
+    <script src="js/common.js"></script>
+    <script src="js/register.js"></script>
+</body>
+</html>

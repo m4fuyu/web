@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国古代建筑成就</title>
+    <meta name="description" content="探索中国古代建筑的魅力与智慧，了解民居、官府、皇宫、桥梁等传统建筑文化">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <!-- 页面头部 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>中国古代建筑成就</h1>
+                </div>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li class="nav-item"><a href="#home" class="nav-link active">首页</a></li>
+                        <li class="nav-item"><a href="#minju" class="nav-link" data-category="民居">民居</a></li>
+                        <li class="nav-item"><a href="#guanfu" class="nav-link" data-category="官府">官府</a></li>
+                        <li class="nav-item"><a href="#huanggong" class="nav-link" data-category="皇宫">皇宫</a></li>
+                        <li class="nav-item"><a href="#qiaoliang" class="nav-link" data-category="桥梁">桥梁</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <div class="user-info" id="userInfo">
+                        <span class="username" id="username">游客</span>
+                        <div class="user-menu">
+                            <a href="login.html" class="login-btn">登录</a>
+                            <a href="register.html" class="register-btn">注册</a>
+                        </div>
+                    </div>
+                    <a href="admin/index.html" class="admin-link">后台管理</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="main">
+        <!-- 轮播图区域 -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-slider">
+                    <div class="slide active">
+                        <div class="slide-content">
+                            <h2>探索中国古代建筑智慧</h2>
+                            <p>从四合院到故宫，从赵州桥到都江堰，感受千年建筑文明的魅力</p>
+                        </div>
+                        <div class="slide-image">
+                            <img src="images/banner/ancient-architecture.jpg" alt="中国古代建筑">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 搜索区域 -->
+        <section class="search-section">
+            <div class="container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索建筑名称、地点..." class="search-input">
+                    <button id="searchBtn" class="search-btn">搜索</button>
+                </div>
+                <div class="filter-tabs">
+                    <button class="filter-btn active" data-category="">全部</button>
+                    <button class="filter-btn" data-category="民居">民居</button>
+                    <button class="filter-btn" data-category="官府">官府</button>
+                    <button class="filter-btn" data-category="皇宫">皇宫</button>
+                    <button class="filter-btn" data-category="桥梁">桥梁</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 建筑列表区域 -->
+        <section class="buildings-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>建筑展示</h2>
+                    <p class="section-desc">精选中国古代建筑杰作，展现传统建筑文化</p>
+                </div>
+                <div class="buildings-grid" id="buildingsGrid">
+                    <!-- 建筑卡片将通过JavaScript动态加载 -->
+                    <div class="loading">加载中...</div>
+                </div>
+                <div class="pagination" id="pagination">
+                    <!-- 分页将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 统计信息区域 -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalBuildings">0</div>
+                        <div class="stat-label">建筑总数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalCategories">4</div>
+                        <div class="stat-label">建筑分类</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalViews">0</div>
+                        <div class="stat-label">总浏览量</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalComments">0</div>
+                        <div class="stat-label">用户评论</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页面底部 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>关于我们</h3>
+                    <p>本网站致力于展示中国古代建筑的辉煌成就，传承和弘扬中华优秀传统文化。</p>
+                </div>
+                <div class="footer-section">
+                    <h3>建筑分类</h3>
+                    <ul>
+                        <li><a href="#" data-category="民居">传统民居</a></li>
+                        <li><a href="#" data-category="官府">古代官府</a></li>
+                        <li><a href="#" data-category="皇宫">皇宫建筑</a></li>
+                        <li><a href="#" data-category="桥梁">古代桥梁</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>联系方式</h3>
+                    <p>邮箱：contact@ancient-architecture.com</p>
+                    <p>电话：010-12345678</p>
+                    <p>地址：北京市朝阳区</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 中国古代建筑成就. 版权所有.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="back-to-top">↑</button>
+
+    <!-- JavaScript文件 -->
+    <script src="js/common.js"></script>
+    <script src="js/index.js"></script>
+</body>
+</html>
