@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建筑解说</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body data-page="detail">
+
+    <header>古代建筑解说</header>
+
+    <div class="detail-container">
+        <a href="index.html" class="back-btn">← 返回首页</a>
+        
+        <h1 id="detail-title" class="detail-title">加载中…</h1>
+        <img id="detail-img" class="detail-image" src="" alt="建筑图片">
+        <p id="detail-desc" class="detail-desc">
+            加载描述中…
+        </p>
+    </div>
+
+    <!-- Floating Trigger -->
+    <div id="ai-trigger" class="floating-trigger">
+        💬
+    </div>
+
+    <!-- AI Chat Window -->
+    <div id="ai-window" class="ai-window">
+        <div class="ai-header">
+            <span>AI助手</span>
+            <span id="close-ai" class="close-ai">&times;</span>
+        </div>
+        <div class="ai-content">
+            敬请期待：与 AI 沟通了解更多！
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
