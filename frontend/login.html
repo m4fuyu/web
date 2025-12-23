@@ -3,127 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用户登录 - 中国古代建筑成就</title>
-    <meta name="description" content="登录中国古代建筑成就网站，探索更多建筑文化内容">
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/auth.css">
+    <title>用户登录</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { overflow: auto; }
+    </style>
 </head>
-<body>
-    <!-- 页面头部 -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <h1><a href="index.html">中国古代建筑成就</a></h1>
-                </div>
-                <nav class="nav">
-                    <ul class="nav-list">
-                        <li class="nav-item"><a href="index.html" class="nav-link">首页</a></li>
-                        <li class="nav-item"><a href="index.html#minju" class="nav-link">民居</a></li>
-                        <li class="nav-item"><a href="index.html#guanfu" class="nav-link">官府</a></li>
-                        <li class="nav-item"><a href="index.html#huanggong" class="nav-link">皇宫</a></li>
-                        <li class="nav-item"><a href="index.html#qiaoliang" class="nav-link">桥梁</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
+<body data-page="login">
+    <header>
+        用户登录
+        <a class="auth-link" href="index.html">返回首页</a>
     </header>
 
-    <!-- 主要内容 -->
-    <main class="main">
-        <div class="container">
-            <div class="auth-container">
-                <div class="auth-card">
-                    <div class="auth-header">
-                        <h2>用户登录</h2>
-                        <p>欢迎回来，请登录您的账号</p>
-                    </div>
-
-                    <form id="loginForm" class="auth-form">
-                        <div class="form-group">
-                            <label for="username">用户名</label>
-                            <input type="text" id="username" name="username"
-                                   placeholder="请输入用户名" required
-                                   pattern="^[a-zA-Z][a-zA-Z0-9_]{5,17}$"
-                                   title="用户名必须是6-18位字母、数字或下划线，且以字母开头">
-                            <span class="form-error" id="usernameError"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password">密码</label>
-                            <input type="password" id="password" name="password"
-                                   placeholder="请输入密码" required
-                                   minlength="6">
-                            <span class="form-error" id="passwordError"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="remember" name="remember">
-                                <span class="checkmark"></span>
-                                记住我
-                            </label>
-                            <a href="#" class="forgot-password">忘记密码？</a>
-                        </div>
-
-                        <button type="submit" class="auth-btn" id="loginBtn">
-                            <span class="btn-text">登录</span>
-                            <span class="btn-loading" style="display: none;">登录中...</span>
-                        </button>
-                    </form>
-
-                    <div class="auth-footer">
-                        <p>还没有账号？<a href="register.html">立即注册</a></p>
-                        <p><a href="admin/index.html">管理员登录</a></p>
-                    </div>
-                </div>
-
-                <div class="auth-info">
-                    <div class="info-content">
-                        <h3>加入我们</h3>
-                        <p>登录后您可以：</p>
-                        <ul>
-                            <li>查看详细的建筑介绍</li>
-                            <li>收藏喜欢的建筑作品</li>
-                            <li>发表评论和观点</li>
-                            <li>参与建筑文化讨论</li>
-                            <li>获取个性化推荐</li>
-                        </ul>
-                        <div class="info-image">
-                            <img src="images/ui/building-icon.png" alt="中国古代建筑">
-                        </div>
-                    </div>
-                </div>
+    <div class="auth-container">
+        <div class="form-title">登录到古代建筑成就</div>
+        <form>
+            <div class="form-field">
+                <label class="form-label" for="username">用户名</label>
+                <input class="form-input" id="username" type="text" placeholder="请输入用户名">
             </div>
+            <div class="form-field">
+                <label class="form-label" for="password">密码</label>
+                <input class="form-input" id="password" type="password" placeholder="请输入密码">
+            </div>
+            <div class="form-field">
+                <label class="form-label">验证码</label>
+                <div class="captcha-box">
+                    <span id="login-captcha-code" class="captcha-code"></span>
+                    <button type="button" id="login-captcha-refresh" class="captcha-refresh">刷新</button>
+                </div>
+                <input class="form-input" id="login-captcha-input" type="text" placeholder="输入验证码">
+            </div>
+            <button class="primary-btn" type="button" id="login-btn">登录</button>
+            <div id="login-error" class="error-text"></div>
+        </form>
+        <div class="auth-note">
+            没有账号？<a href="register.html">点此注册</a>
         </div>
-    </main>
+    </div>
 
-    <!-- 页面底部 -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>关于我们</h3>
-                    <p>本网站致力于展示中国古代建筑的辉煌成就，传承和弘扬中华优秀传统文化。</p>
-                </div>
-                <div class="footer-section">
-                    <h3>建筑分类</h3>
-                    <ul>
-                        <li><a href="index.html?category=民居">传统民居</a></li>
-                        <li><a href="index.html?category=官府">古代官府</a></li>
-                        <li><a href="index.html?category=皇宫">皇宫建筑</a></li>
-                        <li><a href="index.html?category=桥梁">古代桥梁</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 中国古代建筑成就. 版权所有.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- JavaScript文件 -->
-    <script src="js/common.js"></script>
-    <script src="js/login.js"></script>
-</body>
+    <script src="js/login-new.js"></script>
+    </body>
 </html>

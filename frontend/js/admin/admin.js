@@ -41,8 +41,9 @@ function checkAdminAuth() {
     }
     
     // 显示管理员名称
-    if (userSession.username) {
-        document.getElementById('adminName').textContent = userSession.username;
+    const adminNameEl = document.getElementById('adminName');
+    if (adminNameEl && userSession.username) {
+        adminNameEl.textContent = userSession.username;
     }
 }
 
@@ -51,13 +52,22 @@ function checkAdminAuth() {
  */
 function bindEvents() {
     // 添加用户表单提交
-    document.getElementById('addUserForm').addEventListener('submit', handleAddUser);
+    const addUserForm = document.getElementById('addUserForm');
+    if (addUserForm) {
+        addUserForm.addEventListener('submit', handleAddUser);
+    }
     
     // 刷新按钮
-    document.getElementById('refreshBtn').addEventListener('click', loadUserList);
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', loadUserList);
+    }
     
     // 退出登录
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
 }
 
 /**
@@ -65,6 +75,8 @@ function bindEvents() {
  */
 async function loadUserList() {
     const userListDiv = document.getElementById('userList');
+    if (!userListDiv) return;
+    
     userListDiv.innerHTML = '<div class="loading">加载中...</div>';
     
     try {
@@ -87,6 +99,7 @@ async function loadUserList() {
  */
 function displayUserList(users) {
     const userListDiv = document.getElementById('userList');
+    if (!userListDiv) return;
     
     if (!users || users.length === 0) {
         userListDiv.innerHTML = '<div class="empty-state">暂无用户数据</div>';
@@ -135,9 +148,14 @@ function displayUserList(users) {
 async function handleAddUser(e) {
     e.preventDefault();
     
-    const username = document.getElementById('newUsername').value.trim();
-    const password = document.getElementById('newPassword').value.trim();
+    const usernameEl = document.getElementById('newUsername');
+    const passwordEl = document.getElementById('newPassword');
     const messageDiv = document.getElementById('addMessage');
+    
+    if (!usernameEl || !passwordEl || !messageDiv) return;
+    
+    const username = usernameEl.value.trim();
+    const password = passwordEl.value.trim();
     
     // 清除消息
     messageDiv.className = 'message';
@@ -156,10 +174,10 @@ async function handleAddUser(e) {
         return;
     }
     
-    // 密码格式验证
-    const passwordPattern = /^[A-Z][a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?~`]{7,15}$/;
+    // 密码格式验证：6-16位，可以使用字母、数字和特殊符号
+    const passwordPattern = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?~`]{6,16}$/;
     if (!passwordPattern.test(password)) {
-        showMessage('addMessage', '密码必须为8-16位，首字母必须大写，可以使用字母、数字和特殊符号', 'error');
+        showMessage('addMessage', '密码必须为6-16位，可以使用字母、数字和特殊符号', 'error');
         return;
     }
     
@@ -179,7 +197,10 @@ async function handleAddUser(e) {
         if (result.status === 'success') {
             showMessage('addMessage', result.message, 'success');
             // 清空表单
-            document.getElementById('addUserForm').reset();
+            const addUserForm = document.getElementById('addUserForm');
+            if (addUserForm) {
+                addUserForm.reset();
+            }
             // 刷新用户列表
             setTimeout(() => loadUserList(), 500);
         } else {
@@ -192,7 +213,7 @@ async function handleAddUser(e) {
 }
 
 /**
- * 删除用户
+ * 删除用户（全局函数，供按钮调用）
  */
 async function deleteUser(username) {
     if (!confirm(`确定要删除用户 "${username}" 吗？此操作不可恢复！`)) {
@@ -241,6 +262,8 @@ function handleLogout() {
  */
 function showMessage(elementId, message, type) {
     const messageDiv = document.getElementById(elementId);
+    if (!messageDiv) return;
+    
     messageDiv.textContent = message;
     messageDiv.className = `message ${type}`;
     messageDiv.style.display = 'block';
