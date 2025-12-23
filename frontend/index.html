@@ -15,16 +15,18 @@
     <header>
         中国古代建筑成就
         <a class="auth-link" href="login.html">登录/注册</a>
+        <button id="reset-btn" class="reset-btn" title="重置游戏进度（测试用）">重置</button>
     </header>
 
     <div class="main-container">
         <!-- 小游戏占位 -->
         <div class="game-area">
-            <div class="game-placeholder-text">
+            <div class="game-placeholder-text" id="game-placeholder">
                 <h2>古代建筑小游戏</h2>
                 <p id="game-msg">游玩小游戏以解锁建筑成就！</p>
             </div>
             <button id="play-btn" class="play-btn">开始游玩</button>
+            <img id="game-map" class="game-map" src="../gameImgRes/gameMap.png" alt="游戏地图" style="display: none;">
         </div>
 
         <!-- 滚动图鉴 -->
