@@ -80,9 +80,10 @@ try {
         exit();
     }
 
-    // 插入新用户到普通用户表
+    // 插入新用户到普通用户表，初始化关卡进度（紫禁城默认true，其他默认false）
     $password_safe = mysqli_real_escape_string($conn, $password);
-    $insert_query = "INSERT INTO userAccount (username, password) VALUES ('$username_safe', '$password_safe')";
+    $insert_query = "INSERT INTO userAccount (username, password, ForbiddenCity, GreatWall, TempleOfHeaven, YellowCraneTower, PotalaPalace) 
+                     VALUES ('$username_safe', '$password_safe', TRUE, FALSE, FALSE, FALSE, FALSE)";
 
     if (mysqli_query($conn, $insert_query)) {
         $response = [

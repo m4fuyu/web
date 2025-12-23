@@ -88,15 +88,24 @@ $db_password_encoded = base64_encode($db_password);
 if ($encoded_password === $db_password_encoded) {
     // 密码正确，设置cookie
     $cookie_name = "user_session";
-    $cookie_value = json_encode([
+    $cookie_data = [
         'username' => $user['username'],
         'is_admin' => $is_admin,
         'login_time' => time()
-    ]);
+    ];
+    $cookie_value = json_encode($cookie_data, JSON_UNESCAPED_UNICODE);
     $cookie_expiry = time() + (86400 * 30); // 30天过期
-    $cookie_path = "/";
-
-    setcookie($cookie_name, $cookie_value, $cookie_expiry, $cookie_path, "", false, true);
+    
+    // 检测并设置正确的cookie路径
+    $script_dir = dirname($_SERVER['SCRIPT_NAME']); // 获取当前脚本的目录路径
+    // 从 /code/backend/api/user/ 提取 /code/
+    $cookie_path = '/';
+    if (strpos($script_dir, '/code') === 0) {
+        $cookie_path = '/code/';
+    }
+    
+    // HttpOnly设置为false，允许前端JavaScript读取cookie
+    setcookie($cookie_name, $cookie_value, $cookie_expiry, $cookie_path, "", false, false);
 
     // 根据用户类型设置跳转地址（相对于前端页面路径）
     $redirect_url = $is_admin ? 'admin/index.html' : 'index.html';

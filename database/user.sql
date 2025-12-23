@@ -28,6 +28,11 @@ DROP TABLE IF EXISTS `userAccount`;
 CREATE TABLE `userAccount` (
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `ForbiddenCity` BOOLEAN DEFAULT TRUE COMMENT '紫禁城',
+  `GreatWall` BOOLEAN DEFAULT FALSE COMMENT '长城',
+  `TempleOfHeaven` BOOLEAN DEFAULT FALSE COMMENT '天坛',
+  `YellowCraneTower` BOOLEAN DEFAULT FALSE COMMENT '黄鹤楼',
+  `PotalaPalace` BOOLEAN DEFAULT FALSE COMMENT '布达拉宫',
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -38,21 +43,26 @@ DROP TABLE IF EXISTS `adminAccount`;
 CREATE TABLE `adminAccount` (
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `ForbiddenCity` BOOLEAN DEFAULT TRUE COMMENT '紫禁城',
+  `GreatWall` BOOLEAN DEFAULT FALSE COMMENT '长城',
+  `TempleOfHeaven` BOOLEAN DEFAULT FALSE COMMENT '天坛',
+  `YellowCraneTower` BOOLEAN DEFAULT FALSE COMMENT '黄鹤楼',
+  `PotalaPalace` BOOLEAN DEFAULT FALSE COMMENT '布达拉宫',
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of `userAccount`
 -- ----------------------------
-INSERT INTO `userAccount` VALUES ('testuser', '123456');
-INSERT INTO `userAccount` VALUES ('demo', 'demopass');
-INSERT INTO `userAccount` VALUES ('user001', '123456');
-INSERT INTO `userAccount` VALUES ('user002', '123456');
-INSERT INTO `userAccount` VALUES ('zhangsan', '123456');
-INSERT INTO `userAccount` VALUES ('lisi', '123456');
+INSERT INTO `userAccount` VALUES ('testuser', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('demo', 'demopass', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('user001', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('user002', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('zhangsan', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('lisi', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
 
 -- ----------------------------
 -- Records of `adminAccount`
 -- ----------------------------
-INSERT INTO `adminAccount` VALUES ('admin', '123456');
-INSERT INTO `adminAccount` VALUES ('admin2', '114514');
+INSERT INTO `adminAccount` VALUES ('admin', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `adminAccount` VALUES ('admin2', '114514', TRUE, FALSE, FALSE, FALSE, FALSE);

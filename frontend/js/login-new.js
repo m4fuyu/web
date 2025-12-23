@@ -128,7 +128,7 @@ function initLoginPage() {
             
             // 处理响应
             if (result.status === 'success') {
-                // 登录成功，显示成功消息
+                // 显示成功消息
                 errorEl.style.color = '#4caf50';
                 errorEl.textContent = `${result.message} - 用户: ${result.user_info.username}${result.user_info.is_admin ? ' (管理员)' : ' (普通用户)'}`;
                 

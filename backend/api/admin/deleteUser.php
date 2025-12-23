@@ -1,6 +1,20 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
+// 引入管理员权限验证函数
+require_once __DIR__ . '/checkAdminAuth.php';
+
+// 验证管理员权限
+$admin_session = checkAdminAuth();
+if (!$admin_session) {
+    $response = [
+        'status' => 'error',
+        'message' => '未登录或没有管理员权限，请先登录管理员账号'
+    ];
+    echo json_encode($response, JSON_UNESCAPED_UNICODE);
+    exit();
+}
+
 // 数据库配置
 $servername = "localhost";
 $db_username = "root";

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>用户管理 - 管理员界面</title>
-    <link rel="stylesheet" href="../css/test.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
@@ -45,16 +44,28 @@
             <section class="user-list-section">
                 <div class="section-header">
                     <h2>用户列表</h2>
-                    <button id="refreshBtn" class="btn btn-secondary">刷新</button>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="搜索用户名..." class="search-input">
+                            <button id="searchBtn" class="btn btn-secondary">搜索</button>
+                            <button id="clearSearchBtn" class="btn btn-secondary" style="display:none;">清除</button>
+                        </div>
+                        <button id="refreshBtn" class="btn btn-secondary">刷新</button>
+                    </div>
                 </div>
                 <div id="userList" class="user-list">
                     <div class="loading">加载中...</div>
+                </div>
+                <div id="pagination" class="pagination" style="display:none;">
+                    <button id="prevPageBtn" class="btn btn-secondary">上一页</button>
+                    <span id="pageInfo" class="page-info"></span>
+                    <button id="nextPageBtn" class="btn btn-secondary">下一页</button>
                 </div>
             </section>
         </main>
     </div>
 
-    <script src="../js/admin/admin.js"></script>
+    <script src="js/admin.js"></script>
 </body>
 </html>
 
