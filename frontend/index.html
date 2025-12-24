@@ -19,20 +19,24 @@
     </header>
 
     <div class="main-container">
-        <!-- 小游戏占位 -->
-        <div class="game-area">
-            <div class="game-placeholder-text" id="game-placeholder">
-                <h2>古代建筑小游戏</h2>
-                <p id="game-msg">游玩小游戏以解锁建筑成就！</p>
+        <div class="game-and-list-container">
+            <!-- 小游戏占位 -->
+            <div class="game-area">
+                <div class="game-placeholder-text" id="game-placeholder">
+                    <h2>古代建筑小游戏</h2>
+                    <p id="game-msg">游玩小游戏以解锁建筑成就！</p>
+                </div>
+                <button id="play-btn" class="play-btn">开始游玩</button>
+                <img id="game-map" class="game-map" src="../gameImgRes/gameMap.png" alt="游戏地图" style="display: none;">
             </div>
-            <button id="play-btn" class="play-btn">开始游玩</button>
-            <img id="game-map" class="game-map" src="../gameImgRes/gameMap.png" alt="游戏地图" style="display: none;">
-        </div>
 
-        <!-- 滚动图鉴 -->
-        <h3>建筑图鉴</h3>
-        <div id="building-list" class="scroll-container">
-            <!-- Items will be injected by JS -->
+            <!-- 滚动图鉴 -->
+            <div class="building-list-wrapper">
+                <h3>建筑图鉴</h3>
+                <div id="building-list" class="scroll-container">
+                    <!-- Items will be injected by JS -->
+                </div>
+            </div>
         </div>
     </div>
 

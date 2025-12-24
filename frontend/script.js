@@ -231,15 +231,15 @@ function setupAutoScroll(repeats = 2) {
     const container = document.getElementById('building-list');
     if (!container) return;
 
-    const originalWidth = container.scrollWidth / repeats;
-    const resetAt = originalWidth * (repeats - 1);
+    const originalHeight = container.scrollHeight / repeats;
+    const resetAt = originalHeight * (repeats - 1);
     let speed = 0.6; // 每帧滚动像素（约 60fps）
     let rafId;
 
     function step() {
-        container.scrollLeft += speed;
-        if (container.scrollLeft >= resetAt) {
-            container.scrollLeft = 0;
+        container.scrollTop += speed;
+        if (container.scrollTop >= resetAt) {
+            container.scrollTop = 0;
         }
         rafId = requestAnimationFrame(step);
     }
