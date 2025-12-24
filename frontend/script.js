@@ -71,6 +71,111 @@ function saveBuildings(data) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
+// Sync progress with backend
+async function syncProgressWithBackend() {
+    try {
+        const response = await fetch('../backend/api/building/getProgress.php');
+        if (!response.ok) return false;
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) return false;
+        
+        const result = await response.json();
+        if (result.status === 'error') return false;
+
+        // Get progress data from response structure
+        // Structure is: { status: 'success', data: { username: '...', progress: { ... } } }
+        const progressData = result.data && result.data.progress ? result.data.progress : result;
+
+        // Map backend fields to IDs
+        const mapping = {
+            'ForbiddenCity': 1,
+            'TempleOfHeaven': 2,
+            'PotalaPalace': 3,
+            'YellowCraneTower': 4,
+            'GreatWall': 5
+        };
+
+        const currentBuildings = getBuildings();
+        let changed = false;
+
+        for (const [key, id] of Object.entries(mapping)) {
+            if (progressData[key] !== undefined) {
+                // Handle various boolean representations (1, "1", true, "true")
+                const val = progressData[key];
+                const isUnlocked = (val == 1 || val === 'true' || val === true);
+                
+                const building = currentBuildings.find(b => b.id === id);
+                if (building && building.unlocked !== isUnlocked) {
+                    building.unlocked = isUnlocked;
+                    changed = true;
+                }
+            }
+        }
+
+        if (changed) {
+            saveBuildings(currentBuildings);
+            return true;
+        }
+    } catch (e) {
+        console.error('Failed to sync progress:', e);
+    }
+    return false;
+}
+
+// Cookie Helpers
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+function getUserSession() {
+    let cookieValue = getCookie('user_session');
+    if (!cookieValue) return null;
+    try {
+        // Try decoding once
+        let decoded = decodeURIComponent(cookieValue);
+        // Try parsing
+        try {
+            return JSON.parse(decoded);
+        } catch (e) {
+            // Try decoding again (double encoded)
+            return JSON.parse(decodeURIComponent(decoded));
+        }
+    } catch (e) {
+        console.error('Error parsing user session:', e);
+        return null;
+    }
+}
+
+function updateAuthUI() {
+    const authLink = document.querySelector('.auth-link');
+    if (!authLink) return;
+
+    const session = getUserSession();
+    if (session && session.username) {
+        authLink.textContent = `您好(${session.username})_点击退出`;
+        authLink.href = "#";
+        
+        // Remove any existing event listeners by cloning (simple way) or just setting onclick
+        // Since this runs once on init, onclick is fine.
+        authLink.onclick = (e) => {
+            e.preventDefault();
+            if (confirm('确定要退出登录吗？')) {
+                // Clear cookie
+                document.cookie = "user_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                // Also try clearing with /code/ path just in case, or current path
+                const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+                document.cookie = `user_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path};`;
+                
+                window.location.reload();
+            }
+        };
+    }
+}
+
 // Initialize data if not present
 if (!localStorage.getItem(STORAGE_KEY)) {
     saveBuildings(buildings);
@@ -90,7 +195,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Update progress to backend
+async function updateProgressToBackend(buildingId, isUnlocked) {
+    try {
+        const formData = new FormData();
+        formData.append('building_id', buildingId);
+        formData.append('unlocked', isUnlocked);
+
+        const response = await fetch('../backend/api/building/updateProgress.php', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Progress saved to backend:', result);
+        }
+    } catch (e) {
+        console.error('Failed to save progress to backend:', e);
+    }
+}
+
 function initHomePage() {
+    updateAuthUI();
     const scrollContainer = document.getElementById('building-list');
     const playBtn = document.getElementById('play-btn');
     const gameMsg = document.getElementById('game-msg');
@@ -163,6 +290,13 @@ function initHomePage() {
     // Initial render
     renderList();
 
+    // Sync with backend and re-render if needed
+    syncProgressWithBackend().then(changed => {
+        if (changed) {
+            renderList();
+        }
+    });
+
     // Reset Button Logic (for testing)
     const resetBtn = document.getElementById('reset-btn');
     if (resetBtn) {
@@ -220,6 +354,9 @@ function initHomePage() {
             const newBuildings = currentBuildings.map(b => b.id === toUnlock.id ? toUnlock : b);
             saveBuildings(newBuildings);
 
+            // Update backend
+            updateProgressToBackend(toUnlock.id, true);
+
             // Update UI - 保持地图显示，只更新解锁状态
             playBtn.disabled = false;
             renderList();
@@ -252,7 +389,10 @@ function setupAutoScroll(repeats = 2) {
     container.addEventListener('mouseleave', () => { speed = 0.6; });
 }
 
-function initDetailPage() {
+async function initDetailPage() {
+    // Sync with backend first to ensure we have the latest unlock status
+    await syncProgressWithBackend();
+
     const params = new URLSearchParams(window.location.search);
     const id = parseInt(params.get('id'));
     const currentBuildings = getBuildings();

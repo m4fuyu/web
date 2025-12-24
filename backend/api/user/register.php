@@ -4,7 +4,7 @@ header('Content-Type: application/json; charset=utf-8');
 // 数据库配置
 $servername = "localhost";
 $db_username = "root";  // 请修改为你的数据库用户名
-$db_password = "";      // 请修改为你的数据库密码
+$db_password = "root";      // 请修改为你的数据库密码
 $dbname = "user_management";
 
 // 创建数据库连接

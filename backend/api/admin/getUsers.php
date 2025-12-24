@@ -18,7 +18,7 @@ if (!$admin_session) {
 // 数据库配置
 $servername = "localhost";
 $db_username = "root";
-$db_password = "";
+$db_password = "root";
 $dbname = "user_management";
 
 // 创建数据库连接
