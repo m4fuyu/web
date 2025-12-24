@@ -60,6 +60,7 @@ INSERT INTO `userAccount` VALUES ('user001', '123456', TRUE, FALSE, FALSE, FALSE
 INSERT INTO `userAccount` VALUES ('user002', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
 INSERT INTO `userAccount` VALUES ('zhangsan', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
 INSERT INTO `userAccount` VALUES ('lisi', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('1999', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
 
 -- ----------------------------
 -- Records of `adminAccount`
