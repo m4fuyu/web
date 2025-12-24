@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 管理员界面</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 头部导航 -->
+        <header class="admin-header">
+            <h1>用户管理系统</h1>
+            <div class="user-info">
+                <span id="adminName">管理员</span>
+                <button id="logoutBtn" class="btn btn-secondary">退出登录</button>
+            </div>
+        </header>
+
+        <!-- 主要内容区域 -->
+        <main class="admin-main">
+            <!-- 添加用户表单 -->
+            <section class="add-user-section">
+                <h2>添加新用户</h2>
+                <form id="addUserForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newUsername">用户名：</label>
+                            <input type="text" id="newUsername" name="username" required placeholder="4-15位字母和数字">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">密码：</label>
+                            <input type="password" id="newPassword" name="password" required placeholder="8-16位，首字母大写">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">添加用户</button>
+                        </div>
+                    </div>
+                </form>
+                <div id="addMessage" class="message"></div>
+            </section>
+
+            <!-- 用户列表 -->
+            <section class="user-list-section">
+                <div class="section-header">
+                    <h2>用户列表</h2>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="搜索用户名..." class="search-input">
+                            <button id="searchBtn" class="btn btn-secondary">搜索</button>
+                            <button id="clearSearchBtn" class="btn btn-secondary" style="display:none;">清除</button>
+                        </div>
+                        <button id="refreshBtn" class="btn btn-secondary">刷新</button>
+                    </div>
+                </div>
+                <div id="userList" class="user-list">
+                    <div class="loading">加载中...</div>
+                </div>
+                <div id="pagination" class="pagination" style="display:none;">
+                    <button id="prevPageBtn" class="btn btn-secondary">上一页</button>
+                    <span id="pageInfo" class="page-info"></span>
+                    <button id="nextPageBtn" class="btn btn-secondary">下一页</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
+

@@ -1,16 +1,29 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
+// 引入管理员权限验证函数
+require_once __DIR__ . '/checkAdminAuth.php';
+
+// 验证管理员权限
+$admin_session = checkAdminAuth();
+if (!$admin_session) {
+    $response = [
+        'status' => 'error',
+        'message' => '未登录或没有管理员权限，请先登录管理员账号'
+    ];
+    echo json_encode($response, JSON_UNESCAPED_UNICODE);
+    exit();
+}
+
 // 数据库配置
 $servername = "localhost";
-$db_username = "root";  // 请修改为你的数据库用户名
-$db_password = "";      // 请修改为你的数据库密码
+$db_username = "root";
+$db_password = "";
 $dbname = "user_management";
 
 // 创建数据库连接
 $conn = mysqli_connect($servername, $db_username, $db_password, $dbname);
 
-// 检查连接是否成功
 if (!$conn) {
     $response = [
         'status' => 'error',
@@ -20,9 +33,18 @@ if (!$conn) {
     exit();
 }
 
-// 设置字符集
 mysqli_set_charset($conn, "utf8");
 
+// 检查请求方法
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    $response = [
+        'status' => 'error',
+        'message' => '只支持POST请求'
+    ];
+    echo json_encode($response, JSON_UNESCAPED_UNICODE);
+    mysqli_close($conn);
+    exit();
+}
 
 // 获取并验证输入数据
 $username = isset($_POST['username']) ? trim($_POST['username']) : '';
@@ -55,7 +77,7 @@ $password_pattern = '/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?~`]{6,16}$/
 if (!preg_match($password_pattern, $password)) {
     $response = [
         'status' => 'error',
-        'message' => '密码必须为6-16位,可以使用字母、数字和特殊符号'
+        'message' => '密码必须为6-16位，可以使用字母、数字和特殊符号'
     ];
     echo json_encode($response, JSON_UNESCAPED_UNICODE);
     mysqli_close($conn);
@@ -63,14 +85,14 @@ if (!preg_match($password_pattern, $password)) {
 }
 
 try {
-    // 检查用户名是否已存在（合并查询普通用户表和管理员表）
+    // 检查用户名是否已存在（检查普通用户表和管理员表）
     $username_safe = mysqli_real_escape_string($conn, $username);
-    $query = "SELECT username FROM userAccount WHERE username = '$username_safe'
-              UNION
-              SELECT username FROM adminAccount WHERE username = '$username_safe'";
-    $result = mysqli_query($conn, $query);
-
-    if (mysqli_fetch_assoc($result)) {
+    $check_query = "SELECT username FROM userAccount WHERE username = '$username_safe'
+                    UNION
+                    SELECT username FROM adminAccount WHERE username = '$username_safe'";
+    $check_result = mysqli_query($conn, $check_query);
+    
+    if (mysqli_fetch_assoc($check_result)) {
         $response = [
             'status' => 'error',
             'message' => '用户名已存在'
@@ -79,34 +101,30 @@ try {
         mysqli_close($conn);
         exit();
     }
-
-    // 插入新用户到普通用户表，初始化关卡进度（紫禁城默认true，其他默认false）
+    
+    // 插入新用户，初始化关卡进度（紫禁城默认true，其他默认false）
     $password_safe = mysqli_real_escape_string($conn, $password);
     $insert_query = "INSERT INTO userAccount (username, password, ForbiddenCity, GreatWall, TempleOfHeaven, YellowCraneTower, PotalaPalace) 
                      VALUES ('$username_safe', '$password_safe', TRUE, FALSE, FALSE, FALSE, FALSE)";
-
+    
     if (mysqli_query($conn, $insert_query)) {
         $response = [
             'status' => 'success',
-            'message' => '注册成功',
-            'redirect' => 'login.html'  // 跳转到登录页面
+            'message' => '用户添加成功'
         ];
         echo json_encode($response, JSON_UNESCAPED_UNICODE);
     } else {
-        $response = [
-            'status' => 'error',
-            'message' => '注册失败: ' . mysqli_error($conn)
-        ];
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        throw new Exception('添加失败: ' . mysqli_error($conn));
     }
-
+    
 } catch (Exception $e) {
     $response = [
         'status' => 'error',
-        'message' => '注册过程中发生错误: ' . $e->getMessage()
+        'message' => $e->getMessage()
     ];
     echo json_encode($response, JSON_UNESCAPED_UNICODE);
 }
 
 mysqli_close($conn);
 ?>
+
