@@ -17,6 +17,11 @@ $encoded_password = base64_encode($password);
 // 首先查询普通用户表
 $query = "SELECT username, password FROM userAccount WHERE username = '$username'";
 $result = mysqli_query($conn, $query);
+
+if (!$result) {
+    sendResponse('error', '数据库查询失败(User): ' . mysqli_error($conn));
+}
+
 $user = mysqli_fetch_assoc($result);
 $is_admin = false;
 
@@ -24,6 +29,11 @@ $is_admin = false;
 if (!$user) {
     $query = "SELECT username, password FROM adminAccount WHERE username = '$username'";
     $result = mysqli_query($conn, $query);
+    
+    if (!$result) {
+        sendResponse('error', '数据库查询失败(Admin): ' . mysqli_error($conn));
+    }
+    
     $user = mysqli_fetch_assoc($result);
     $is_admin = true;
 }

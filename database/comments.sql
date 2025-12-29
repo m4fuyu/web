@@ -49,3 +49,22 @@ INSERT INTO `comments` VALUES (10, '2024-12-17 10:28:00', 'zhaomin', 'PotalaPala
 INSERT INTO `comments` VALUES (11, '2024-12-17 10:30:00', 'zhangsan', 'ForbiddenCity', '从午门走到太和殿一路都很震撼。');
 INSERT INTO `comments` VALUES (12, '2024-12-17 10:35:00', 'lisi', 'GreatWall', '建议带点水，路程还是挺累的。');
 
+-- ----------------------------
+-- Table structure for comments
+-- ----------------------------
+DROP TABLE IF EXISTS `comments`;
+CREATE TABLE `comments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `level_id` varchar(50) NOT NULL,
+  `content` text NOT NULL,
+  `send_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of comments
+-- ----------------------------
+INSERT INTO `comments` VALUES ('1', 'lihua', 'ForbiddenCity', '紫禁城真壮观！', '2024-12-29 10:00:00');
+INSERT INTO `comments` VALUES ('2', 'wangwei', 'GreatWall', '不到长城非好汉！', '2024-12-29 10:05:00');
+INSERT INTO `comments` VALUES ('3', 'admin', 'TempleOfHeaven', '天坛的建筑工艺令人惊叹。', '2024-12-29 11:00:00');

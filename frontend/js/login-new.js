@@ -133,7 +133,7 @@ function initLoginPage() {
 
                 // 显示成功消息
                 errorEl.style.color = '#4caf50';
-                errorEl.textContent = `${result.message} - 用户: ${result.user_info.username}${result.user_info.is_admin ? ' (管理员)' : ' (普通用户)'}`;
+                errorEl.textContent = `${result.message} - 用户: ${result.data.username}${result.data.is_admin ? ' (管理员)' : ' (普通用户)'}`;
                 
                 // 延迟跳转，让用户看到成功消息
                 setTimeout(() => {
@@ -141,7 +141,7 @@ function initLoginPage() {
                         window.location.href = result.redirect;
                     } else {
                         // 如果没有指定跳转地址，根据用户类型跳转
-                        window.location.href = result.user_info.is_admin ? 'admin/index.html' : 'index.html';
+                        window.location.href = result.data.is_admin ? 'admin/index.html' : 'index.html';
                     }
                 }, 1000);
             } else {

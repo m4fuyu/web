@@ -15,12 +15,21 @@
     *   `getUsers.php`: 获取用户列表接口（支持分页和搜索）。
     *   `updateUser.php`: 更新用户信息（密码等）接口。
     *   `updateUserProgress.php`: 管理员手动更新用户关卡进度的接口。
+*   **📂 ai** (AI 交互接口)
+    *   `chat.php`: 处理与 AI 模型的对话请求，读取本地文本作为上下文。
 *   **📂 building** (建筑/关卡相关接口)
     *   `getProgress.php`: 获取当前登录用户的建筑解锁进度。
     *   `updateProgress.php`: 用户在前端解锁关卡后，同步进度到数据库的接口。
+*   **📂 comment** (评论系统接口)
+    *   `addComment.php`: 添加新评论。
+    *   `getComments.php`: 获取评论列表。
 *   **📂 user** (用户认证相关接口)
     *   `logincheck.php`: 用户登录验证接口（处理普通用户和管理员登录）。
     *   `register.php`: 用户注册接口。
+*   **公共文件**
+    *   `connectvars.php`: 数据库连接配置常量。
+    *   `constants.php`: 项目通用常量定义。
+    *   `function.php`: 通用辅助函数库（响应处理、数据库连接、用户认证）。
 
 ### 📂 database (数据库)
 *   `user.sql`: 数据库初始化脚本，包含 `userAccount` 和 `adminAccount` 表结构及初始数据。
@@ -49,6 +58,9 @@
 #### 📂 js (其他脚本)
 *   `login-new.js`: 登录页面的逻辑脚本，处理登录请求、验证码校验及登录后的跳转（包含清除旧缓存逻辑）。
 *   `register.js`: 注册页面的逻辑脚本，处理注册请求和验证码。
+
+#### 📂 text (文本资源)
+*   存放各建筑的详细描述文本文件，用于 AI 对话上下文。
 
 ### 📂 imgRes / gameImgRes (资源)
 *   存放项目所需的图片资源（建筑图片、游戏素材等）。

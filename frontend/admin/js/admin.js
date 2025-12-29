@@ -5,6 +5,8 @@
 // 全局变量：当前搜索关键词和页码
 let currentSearch = '';
 let currentPage = 1;
+let currentCommentPage = 1;
+let currentCommentSearch = '';
 
 // 页面加载时初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -16,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 绑定事件
     bindEvents();
+    bindNavEvents();
 });
 
 /**
@@ -154,7 +157,12 @@ async function loadUserList(page = 1, search = '') {
         const result = await response.json();
         
         if (result.status === 'success') {
-            displayUserList(result.data || result.users || [], result);
+            // 兼容多种返回格式：
+            // 1. { data: { users: [...] } } - 新标准格式
+            // 2. { data: { data: [...] } } - 旧格式
+            // 3. { data: [...] } - 简单数组格式
+            const users = result.data.users || result.data.data || (Array.isArray(result.data) ? result.data : []);
+            displayUserList(users, result.data);
         } else {
             userListEl.innerHTML = `<div class="error">加载失败: ${result.message || '未知错误'}</div>`;
             document.getElementById('pagination').style.display = 'none';
@@ -626,3 +634,216 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+
+/**
+ * 绑定导航事件
+ */
+function bindNavEvents() {
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const views = document.querySelectorAll('.view-section');
+
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // 切换按钮状态
+            navBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // 切换视图
+            const targetId = btn.getAttribute('data-target');
+            views.forEach(view => {
+                if (view.id === targetId) {
+                    view.style.display = 'block';
+                } else {
+                    view.style.display = 'none';
+                }
+            });
+
+            // 如果切换到评论管理，加载评论列表
+            if (targetId === 'comment-management') {
+                loadCommentList();
+            }
+        });
+    });
+
+    // 评论刷新按钮
+    const refreshCommentsBtn = document.getElementById('refreshCommentsBtn');
+    if (refreshCommentsBtn) {
+        refreshCommentsBtn.addEventListener('click', () => loadCommentList(currentCommentPage, currentCommentSearch));
+    }
+
+    // 评论分页按钮
+    const prevBtn = document.getElementById('prevCommentPageBtn');
+    const nextBtn = document.getElementById('nextCommentPageBtn');
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => loadCommentList(currentCommentPage - 1, currentCommentSearch));
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => loadCommentList(currentCommentPage + 1, currentCommentSearch));
+    }
+
+    // 评论搜索功能
+    const searchCommentInput = document.getElementById('searchCommentInput');
+    const searchCommentBtn = document.getElementById('searchCommentBtn');
+    const clearCommentSearchBtn = document.getElementById('clearCommentSearchBtn');
+
+    if (searchCommentBtn) {
+        searchCommentBtn.addEventListener('click', () => {
+            const searchTerm = searchCommentInput.value.trim();
+            loadCommentList(1, searchTerm);
+        });
+    }
+
+    if (searchCommentInput) {
+        searchCommentInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const searchTerm = searchCommentInput.value.trim();
+                loadCommentList(1, searchTerm);
+            }
+        });
+    }
+
+    if (clearCommentSearchBtn) {
+        clearCommentSearchBtn.addEventListener('click', () => {
+            searchCommentInput.value = '';
+            loadCommentList(1, '');
+        });
+    }
+
+    // 添加评论表单
+    const addCommentForm = document.getElementById('addCommentForm');
+    if (addCommentForm) {
+        addCommentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const levelId = document.getElementById('commentLevel').value;
+            const content = document.getElementById('commentContent').value.trim();
+            const messageEl = document.getElementById('addCommentMessage');
+
+            if (!content) {
+                messageEl.style.color = '#f44336';
+                messageEl.textContent = '评论内容不能为空';
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('level_id', levelId);
+                formData.append('content', content);
+
+                const response = await fetch('../../backend/api/comment/addComment.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    messageEl.style.color = '#4caf50';
+                    messageEl.textContent = result.message || '评论发表成功';
+                    addCommentForm.reset();
+                    loadCommentList(1, currentCommentSearch); // Reload list
+                    setTimeout(() => { messageEl.textContent = ''; }, 3000);
+                } else {
+                    messageEl.style.color = '#f44336';
+                    messageEl.textContent = result.message || '发表失败';
+                }
+            } catch (error) {
+                console.error('发表评论失败:', error);
+                messageEl.style.color = '#f44336';
+                messageEl.textContent = `发表失败: ${error.message}`;
+            }
+        });
+    }
+}
+
+/**
+ * 加载评论列表
+ */
+async function loadCommentList(page = 1, search = '') {
+    const commentListEl = document.getElementById('commentList');
+    const clearSearchBtn = document.getElementById('clearCommentSearchBtn');
+    
+    currentCommentPage = page;
+    currentCommentSearch = search;
+
+    // 显示/隐藏清除按钮
+    if (clearSearchBtn) {
+        clearSearchBtn.style.display = search ? 'inline-block' : 'none';
+    }
+
+    // 构建请求URL
+    let url = `../../backend/api/comment/getComments.php?page=${page}&pageSize=20`;
+    if (search) {
+        url += `&search=${encodeURIComponent(search)}`;
+    }
+
+    try {
+        commentListEl.innerHTML = '<div class="loading">加载中...</div>';
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            // 兼容多种返回格式
+            const comments = result.data.comments || result.data.data || (Array.isArray(result.data) ? result.data : []);
+            displayCommentList(comments, result.data);
+        } else {
+            commentListEl.innerHTML = `<div class="error">加载失败: ${result.message || '未知错误'}</div>`;
+            document.getElementById('commentPagination').style.display = 'none';
+        }
+    } catch (error) {
+        console.error('加载评论列表失败:', error);
+        commentListEl.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
+        document.getElementById('commentPagination').style.display = 'none';
+    }
+}
+
+/**
+ * 显示评论列表
+ */
+function displayCommentList(comments, paginationInfo = {}) {
+    const commentListEl = document.getElementById('commentList');
+    const paginationEl = document.getElementById('commentPagination');
+    
+    if (!comments || comments.length === 0) {
+        commentListEl.innerHTML = '<div class="empty">暂无评论</div>';
+        paginationEl.style.display = 'none';
+        return;
+    }
+    
+    let html = '<table class="user-table"><thead><tr><th>ID</th><th>用户</th><th>关卡ID</th><th>内容</th><th>时间</th></tr></thead><tbody>';
+    
+    comments.forEach(comment => {
+        html += `
+            <tr>
+                <td>${comment.id}</td>
+                <td>${escapeHtml(comment.username)}</td>
+                <td>${escapeHtml(comment.level_id)}</td>
+                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(comment.content)}">${escapeHtml(comment.content)}</td>
+                <td>${comment.send_time}</td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    commentListEl.innerHTML = html;
+    
+    // 更新分页控件
+    if (paginationInfo.totalPages > 1) {
+        paginationEl.style.display = 'flex';
+        const prevBtn = document.getElementById('prevCommentPageBtn');
+        const nextBtn = document.getElementById('nextCommentPageBtn');
+        const pageInfo = document.getElementById('commentPageInfo');
+        
+        prevBtn.disabled = currentCommentPage <= 1;
+        nextBtn.disabled = currentCommentPage >= paginationInfo.totalPages;
+        pageInfo.textContent = `第 ${currentCommentPage} / ${paginationInfo.totalPages} 页 (共 ${paginationInfo.total} 条)`;
+    } else {
+        paginationEl.style.display = 'none';
+    }
+}

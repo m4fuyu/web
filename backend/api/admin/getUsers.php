@@ -48,7 +48,7 @@ try {
     }
     
     sendResponse('success', '查询成功', [
-        'data' => $users,
+        'users' => $users,
         'total' => $total,
         'page' => $page,
         'pageSize' => $pageSize,

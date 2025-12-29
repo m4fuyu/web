@@ -216,75 +216,77 @@ async function updateProgressToBackend(buildingId, isUnlocked) {
     }
 }
 
+function renderList() {
+    const scrollContainer = document.getElementById('building-list');
+    if (!scrollContainer) return;
+    
+    const currentBuildings = getBuildings();
+    scrollContainer.innerHTML = ''; // Clear
+
+    currentBuildings.forEach(b => {
+        const card = document.createElement('div');
+        card.className = `building-card ${b.unlocked ? '' : 'locked'}`;
+        card.dataset.id = String(b.id);
+        
+        // Image area
+        const img = document.createElement('img');
+        img.className = 'building-img';
+        img.src = b.image;
+        img.alt = b.name;
+        // 添加图片加载错误处理
+        img.onerror = function() {
+            this.src = `https://placehold.co/150x120/a83636/ffffff?text=${encodeURIComponent(b.name)}`;
+        };
+
+        // Name
+        const name = document.createElement('div');
+        name.className = 'building-name';
+        name.textContent = b.name;
+
+        card.appendChild(img);
+        card.appendChild(name);
+
+        // Locked Mask
+        if (!b.unlocked) {
+            const mask = document.createElement('div');
+            mask.className = 'mask';
+            mask.textContent = '未解锁';
+            card.appendChild(mask);
+        }
+
+        scrollContainer.appendChild(card);
+    });
+
+    const REPEATS = 10;
+    const originalCards = Array.from(scrollContainer.children);
+    for (let i = 1; i < REPEATS; i++) {
+        originalCards.forEach(node => {
+            const clone = node.cloneNode(true);
+            scrollContainer.appendChild(clone);
+        });
+    }
+
+    setupAutoScroll(REPEATS);
+}
+
 function initHomePage() {
     updateAuthUI();
+    initBarrage(); // 启动弹幕
     const scrollContainer = document.getElementById('building-list');
     const playBtn = document.getElementById('play-btn');
     const gameMsg = document.getElementById('game-msg');
-    let clickBound = false;
     const REPEATS = 10;
 
-    function renderList() {
-        const currentBuildings = getBuildings();
-        scrollContainer.innerHTML = ''; // Clear
-
-        currentBuildings.forEach(b => {
-            const card = document.createElement('div');
-            card.className = `building-card ${b.unlocked ? '' : 'locked'}`;
-            card.dataset.id = String(b.id);
-            
-            // Image area
-            const img = document.createElement('img');
-            img.className = 'building-img';
-            img.src = b.image;
-            img.alt = b.name;
-            // 添加图片加载错误处理，避免图片加载失败影响页面显示
-            img.onerror = function() {
-                // 如果图片加载失败，使用占位符
-                this.src = `https://placehold.co/150x120/a83636/ffffff?text=${encodeURIComponent(b.name)}`;
-            };
-
-            // Name
-            const name = document.createElement('div');
-            name.className = 'building-name';
-            name.textContent = b.name;
-
-            card.appendChild(img);
-            card.appendChild(name);
-
-            // Locked Mask
-            if (!b.unlocked) {
-                const mask = document.createElement('div');
-                mask.className = 'mask';
-                mask.textContent = '未解锁';
-                card.appendChild(mask);
+    // 委托点击（克隆卡片也可点击）
+    if (scrollContainer) {
+        scrollContainer.addEventListener('click', (e) => {
+            const card = e.target.closest('.building-card');
+            if (!card || card.classList.contains('locked')) return;
+            const id = card.dataset.id;
+            if (id) {
+                window.location.href = `detail.html?id=${id}`;
             }
-
-            scrollContainer.appendChild(card);
         });
-
-        const originalCards = Array.from(scrollContainer.children);
-        for (let i = 1; i < REPEATS; i++) {
-            originalCards.forEach(node => {
-                const clone = node.cloneNode(true);
-                scrollContainer.appendChild(clone);
-            });
-        }
-
-        // 委托点击（克隆卡片也可点击）
-        if (!clickBound) {
-            scrollContainer.addEventListener('click', (e) => {
-                const card = e.target.closest('.building-card');
-                if (!card || card.classList.contains('locked')) return;
-                const id = card.dataset.id;
-                if (id) {
-                    window.location.href = `detail.html?id=${id}`;
-                }
-            });
-            clickBound = true;
-        }
-
-        setupAutoScroll(REPEATS);
     }
 
     // Initial render
@@ -300,26 +302,49 @@ function initHomePage() {
     // Reset Button Logic (for testing)
     const resetBtn = document.getElementById('reset-btn');
     if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
+        resetBtn.addEventListener('click', async () => {
             if (confirm('确定要重置所有游戏进度吗？这将清空所有解锁的建筑。')) {
+                try {
+                    // Call backend to reset progress
+                    const response = await fetch('../backend/api/building/resetProgress.php', {
+                        method: 'POST'
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.status === 'success') {
+                            console.log('Backend progress reset successfully');
+                        } else {
+                            console.error('Backend reset failed:', result.message);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to call reset API:', e);
+                }
+
                 localStorage.removeItem(STORAGE_KEY);
                 // 重新初始化数据
                 saveBuildings(buildings);
                 // 重新渲染列表
                 renderList();
                 // 重置游戏区域
-                const gamePlaceholder = document.getElementById('game-placeholder');
-                const gameMap = document.getElementById('game-map');
-                const playBtn = document.getElementById('play-btn');
-                if (gamePlaceholder) gamePlaceholder.classList.remove('hidden');
-                if (gameMap) gameMap.style.display = 'none';
-                if (playBtn) {
-                    playBtn.style.display = 'block';
-                    playBtn.disabled = false;
-                    playBtn.textContent = "开始游玩";
+                const gameArea = document.querySelector('.game-area');
+                if (gameArea) {
+                    // Restore initial HTML structure
+                    gameArea.innerHTML = `
+                        <div class="game-placeholder-text" id="game-placeholder">
+                            <h2>古代建筑小游戏</h2>
+                            <p id="game-msg">游玩小游戏以解锁建筑成就！</p>
+                        </div>
+                        <button id="play-btn" class="play-btn">开始游玩</button>
+                        <img id="game-map" class="game-map" src="../gameImgRes/gameMap.png" alt="游戏地图" style="display: none;">
+                    `;
+                    // Re-bind play button event since we recreated it
+                    const newPlayBtn = document.getElementById('play-btn');
+                    if (newPlayBtn) {
+                        newPlayBtn.addEventListener('click', startGame);
+                    }
                 }
-                const gameMsg = document.getElementById('game-msg');
-                if (gameMsg) gameMsg.textContent = "游玩小游戏以解锁建筑成就！";
                 alert('游戏进度已重置！');
             }
         });
@@ -329,64 +354,40 @@ function initHomePage() {
     const gameMap = document.getElementById('game-map');
     const gamePlaceholder = document.getElementById('game-placeholder');
 
-    playBtn.addEventListener('click', () => {
-        const currentBuildings = getBuildings();
-        const locked = currentBuildings.filter(b => !b.unlocked);
-
-        if (locked.length === 0) {
-            gameMsg.textContent = "已全部解锁！";
-            return;
-        }
-
-        // 显示游戏地图，隐藏占位文本和按钮
-        gamePlaceholder.classList.add('hidden');
-        playBtn.style.display = 'none';
-        gameMap.style.display = 'block';
-
-        // Simulate game play... then unlock one
-        playBtn.disabled = true;
-
-        setTimeout(() => {
-            const toUnlock = locked[Math.floor(Math.random() * locked.length)];
-            toUnlock.unlocked = true;
-            
-            // Update storage
-            const newBuildings = currentBuildings.map(b => b.id === toUnlock.id ? toUnlock : b);
-            saveBuildings(newBuildings);
-
-            // Update backend
-            updateProgressToBackend(toUnlock.id, true);
-
-            // Update UI - 保持地图显示，只更新解锁状态
-            playBtn.disabled = false;
-            renderList();
-        }, 2000);
-    });
+    // 旧的自动解锁逻辑已移除，现在使用新的模态框游戏逻辑
 }
 
 function setupAutoScroll(repeats = 2) {
     const container = document.getElementById('building-list');
     if (!container) return;
 
+    // 清除之前的动画循环，防止速度叠加
+    if (container.dataset.rafId) {
+        cancelAnimationFrame(parseInt(container.dataset.rafId));
+    }
+
     const originalHeight = container.scrollHeight / repeats;
     const resetAt = originalHeight * (repeats - 1);
     let speed = 0.6; // 每帧滚动像素（约 60fps）
-    let rafId;
 
     function step() {
         container.scrollTop += speed;
         if (container.scrollTop >= resetAt) {
             container.scrollTop = 0;
         }
-        rafId = requestAnimationFrame(step);
+        const rafId = requestAnimationFrame(step);
+        container.dataset.rafId = String(rafId);
     }
 
-    if (rafId) cancelAnimationFrame(rafId);
     step();
 
     // 悬停暂停，移出继续
-    container.addEventListener('mouseenter', () => { speed = 0; });
-    container.addEventListener('mouseleave', () => { speed = 0.6; });
+    // 先移除旧的监听器（虽然匿名函数无法移除，但这里我们通过覆盖onmouseenter/onmouseleave来简化，或者接受重复绑定因为影响不大，
+    // 但最佳实践是避免重复绑定。由于renderList会重建DOM内容但不会重建container本身，所以这里会有重复绑定问题。
+    // 更好的方式是将事件绑定移出setupAutoScroll，或者检查是否已绑定。
+    // 简单修复：使用 onmouseenter 属性覆盖
+    container.onmouseenter = () => { speed = 0; };
+    container.onmouseleave = () => { speed = 0.6; };
 }
 
 async function initDetailPage() {
@@ -585,3 +586,477 @@ function initRegisterPage() {
         alert('注册成功（演示），已通过验证码校验');
     });
 }
+
+// --- 弹幕功能 ---
+
+let barrageComments = [];
+let barrageInterval = null;
+
+async function initBarrage() {
+    const container = document.getElementById('barrage-container');
+    if (!container) return;
+
+    // 获取评论数据
+    try {
+        // 获取最近的100条评论
+        const response = await fetch('../backend/api/comment/getComments.php?pageSize=100');
+        if (response.ok) {
+            const result = await response.json();
+            if (result.status === 'success') {
+                // 兼容不同的返回结构
+                const data = result.data;
+                if (data.comments) {
+                    barrageComments = data.comments;
+                } else if (data.data) {
+                    barrageComments = data.data;
+                } else if (Array.isArray(data)) {
+                    barrageComments = data;
+                }
+            }
+        }
+    } catch (e) {
+        console.error('获取弹幕数据失败:', e);
+    }
+
+    // 如果没有评论，使用默认数据
+    if (!barrageComments || barrageComments.length === 0) {
+        barrageComments = [
+            { username: '系统', level_id: 'ForbiddenCity', content: '欢迎来到古代建筑成就！' },
+            { username: '游客', level_id: 'ForbiddenCity', content: '紫禁城真壮观！' },
+            { username: '游客', level_id: 'GreatWall', content: '长城是世界奇迹！' },
+            { username: '系统', level_id: 'TempleOfHeaven', content: '快去玩游戏解锁成就吧！' }
+        ];
+    }
+
+    startBarrage();
+}
+
+function startBarrage() {
+    // 每隔一段时间生成一个弹幕
+    // 随机间隔 0.75s - 1.5s (密度翻倍)
+    function scheduleNext() {
+        const delay = 750 + Math.random() * 750;
+        setTimeout(() => {
+            spawnBarrageItem();
+            scheduleNext();
+        }, delay);
+    }
+    scheduleNext();
+}
+
+function spawnBarrageItem() {
+    const container = document.getElementById('barrage-container');
+    if (!container || barrageComments.length === 0) return;
+
+    // 随机选择一条评论
+    const comment = barrageComments[Math.floor(Math.random() * barrageComments.length)];
+    
+    const item = document.createElement('div');
+    item.className = 'barrage-item';
+    
+    // 格式化内容：用户id 在 某某地点 留言 评论内容
+    const levelMap = {
+        'ForbiddenCity': '紫禁城',
+        'GreatWall': '长城',
+        'TempleOfHeaven': '天坛',
+        'YellowCraneTower': '黄鹤楼',
+        'PotalaPalace': '布达拉宫'
+    };
+    
+    const username = comment.username || '匿名用户';
+    const locationName = levelMap[comment.level_id] || comment.level_id || '未知地点';
+    const content = comment.content || '';
+    
+    item.textContent = `${username} 在 ${locationName} 留言：${content}`;
+    
+    // 随机字体大小 (20px - 30px)
+    const fontSize = 20 + Math.random() * 10;
+    item.style.fontSize = fontSize + 'px';
+
+    // 随机垂直位置 (0% - 90%)
+    const top = Math.random() * 90;
+    item.style.top = top + '%';
+    
+    // 随机动画时长 (11s - 20s) - 减慢速度
+    const duration = 11 + Math.random() * 9;
+    item.style.animationDuration = duration + 's';
+    
+    container.appendChild(item);
+    
+    // 动画结束后移除元素
+    item.addEventListener('animationend', () => {
+        item.remove();
+    });
+}
+
+// --- 游戏核心逻辑 ---
+
+let currentGame = {
+    building: null,
+    questions: [],
+    currentIndex: 0,
+    score: 0,
+    isOver: false
+};
+
+// 模拟AI生成的题目数据 (当后端不可用时使用)
+function getMockQuestions(buildingName) {
+    return [
+        {
+            question: `关于${buildingName}，以下哪个描述是正确的？`,
+            options: ["始建于明朝", "始建于唐朝", "始建于清朝", "始建于宋朝"],
+            correctIndex: 0,
+            hint: "提示：明成祖朱棣时期开始修建。"
+        },
+        {
+            question: `${buildingName}的主要建筑特色是什么？`,
+            options: ["哥特式风格", "巴洛克风格", "中国传统木结构", "古罗马风格"],
+            correctIndex: 2,
+            hint: "提示：使用大量的木材，斗拱结构。"
+        },
+        {
+            question: `${buildingName}在历史上的主要用途是？`,
+            options: ["平民居住", "皇家宫殿/祭祀/防御", "商业中心", "工业基地"],
+            correctIndex: 1,
+            hint: "提示：与皇帝或军事防御有关。"
+        },
+        {
+            question: `下列哪项是${buildingName}的著名景点？`,
+            options: ["埃菲尔铁塔", "自由女神像", "太和殿/祈年殿/敌楼", "悉尼歌剧院"],
+            correctIndex: 2,
+            hint: "提示：核心建筑名称。"
+        },
+        {
+            question: `${buildingName}被列入世界文化遗产是在哪一年？`,
+            options: ["1987年", "2000年", "1990年", "2010年"],
+            correctIndex: 0,
+            hint: "提示：80年代末。"
+        }
+    ];
+}
+
+// 启动游戏 (进入地图模式)
+async function startGame() {
+    const gamePlaceholder = document.getElementById('game-placeholder');
+    const playBtn = document.getElementById('play-btn');
+    const gameMapImg = document.getElementById('game-map');
+    
+    if (gamePlaceholder) gamePlaceholder.classList.add('hidden');
+    if (playBtn) playBtn.style.display = 'none';
+    if (gameMapImg) gameMapImg.style.display = 'none';
+    
+    renderLevelMap();
+}
+
+function renderLevelMap() {
+    const gameArea = document.querySelector('.game-area');
+    if (!gameArea) return;
+    
+    gameArea.innerHTML = ''; // Clear content
+    
+    const container = document.createElement('div');
+    container.className = 'level-map-container';
+    
+    const buildings = getBuildings();
+    
+    // Define layout: 上-布达拉宫(3) 中-天坛(2) 下-紫禁城(1) 左-黄鹤楼(4) 右-长城(5)
+    const layout = [
+        { id: 3, pos: 'up', name: '布达拉宫' },
+        { id: 2, pos: 'center', name: '天坛' },
+        { id: 1, pos: 'down', name: '紫禁城' },
+        { id: 4, pos: 'left', name: '黄鹤楼' },
+        { id: 5, pos: 'right', name: '长城' }
+    ];
+    
+    layout.forEach(item => {
+        const building = buildings.find(b => b.id === item.id);
+        const node = document.createElement('div');
+        node.className = `level-node ${item.pos}`;
+        
+        if (building && building.unlocked) {
+            node.classList.add('unlocked');
+            node.innerHTML = `<div>${item.name}</div>`;
+            node.onclick = () => enterLevel(building);
+        } else {
+            node.classList.add('locked');
+            node.innerHTML = `<div>尚未解锁</div>`;
+        }
+        
+        container.appendChild(node);
+    });
+    
+    gameArea.appendChild(container);
+}
+
+async function enterLevel(building) {
+    const gameArea = document.querySelector('.game-area');
+    if (!gameArea) return;
+    
+    // Initialize Game State
+    currentGame = {
+        building: building,
+        questions: [],
+        currentIndex: 0,
+        score: 0,
+        isOver: false
+    };
+    
+    // Render Quiz UI
+    gameArea.innerHTML = `
+        <div class="game-quiz-container">
+            <div class="game-quiz-header">
+                <h2>挑战：${building.name}</h2>
+                <button class="back-to-map-btn" title="返回地图">×</button>
+            </div>
+            <div id="g-game-loading">
+                <div class="spinner"></div>
+                <p>正在生成题目，请稍候...</p>
+            </div>
+            <div id="g-game-quiz" style="display: none;">
+                <div class="progress-bar">
+                    <div id="g-quiz-progress" class="progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="question-container">
+                    <h3 id="g-question-text">题目内容...</h3>
+                    <p id="g-question-hint" class="hint-text" style="display:none;">提示: ...</p>
+                    <button id="g-show-hint-btn" class="btn-text">查看提示</button>
+                </div>
+                <div id="g-options-container" class="options-grid"></div>
+            </div>
+            <div id="g-game-result" style="display: none;">
+                <div id="g-result-success" style="display: none;">
+                    <h3 class="success-text">恭喜通关！</h3>
+                    <p>你已成功完成挑战，解锁了新的建筑！</p>
+                    <div class="comment-section">
+                        <h4>留下你的感言：</h4>
+                        <textarea id="g-game-comment-input" placeholder="写下你的评论..."></textarea>
+                        <button id="g-submit-comment-btn" class="btn btn-primary">提交评论并解锁下一关</button>
+                    </div>
+                </div>
+                <div id="g-result-fail" style="display: none;">
+                    <h3 class="fail-text">胜败乃兵家常事</h3>
+                    <p>少侠请重新来过！</p>
+                    <button id="g-retry-btn" class="btn btn-secondary">重试</button>
+                    <button id="g-back-map-btn" class="btn btn-text">返回地图</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Bind Events
+    gameArea.querySelector('.back-to-map-btn').onclick = renderLevelMap;
+    gameArea.querySelector('#g-show-hint-btn').onclick = () => {
+        document.getElementById('g-question-hint').style.display = 'block';
+    };
+    gameArea.querySelector('#g-submit-comment-btn').onclick = submitCommentAndUnlock;
+    gameArea.querySelector('#g-retry-btn').onclick = () => enterLevel(building);
+    gameArea.querySelector('#g-back-map-btn').onclick = renderLevelMap;
+
+    // Generate Questions
+    try {
+        const questions = await generateGameQuestions(building);
+        currentGame.questions = questions;
+        
+        document.getElementById('g-game-loading').style.display = 'none';
+        document.getElementById('g-game-quiz').style.display = 'block';
+        renderQuestion(0);
+    } catch (error) {
+        console.error(error);
+        alert("生成题目失败，请稍后重试");
+        renderLevelMap();
+    }
+}
+
+// 生成题目逻辑
+async function generateGameQuestions(building) {
+    try {
+        const response = await fetch('../backend/api/ai/generateQuestions.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                building_name: building.name
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            return result.data;
+        } else {
+            console.error('AI API Error:', result);
+            // Fallback to mock data if AI fails
+            console.warn('Falling back to mock questions due to AI error.');
+            return getMockQuestions(building.name);
+        }
+    } catch (e) {
+        console.error('Failed to fetch questions from AI:', e);
+        // Fallback to mock data
+        return getMockQuestions(building.name);
+    }
+}
+
+// 渲染题目
+function renderQuestion(index) {
+    if (index >= currentGame.questions.length) {
+        finishGame();
+        return;
+    }
+    
+    const q = currentGame.questions[index];
+    const total = currentGame.questions.length;
+    
+    // 更新进度条
+    const progress = ((index) / total) * 100;
+    const progressEl = document.getElementById('g-quiz-progress');
+    if(progressEl) progressEl.style.width = `${progress}%`;
+    
+    // 更新文本
+    document.getElementById('g-question-text').textContent = `${index + 1}. ${q.question}`;
+    
+    // 提示
+    const hintEl = document.getElementById('g-question-hint');
+    hintEl.textContent = q.hint;
+    hintEl.style.display = 'none';
+    
+    // 选项
+    const optionsContainer = document.getElementById('g-options-container');
+    optionsContainer.innerHTML = '';
+    
+    q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt; 
+        btn.onclick = () => handleAnswer(i, btn);
+        optionsContainer.appendChild(btn);
+    });
+}
+
+// 处理回答
+function handleAnswer(selectedIndex, btnElement) {
+    if (currentGame.isOver) return;
+    
+    const q = currentGame.questions[currentGame.currentIndex];
+    const isCorrect = selectedIndex === q.correctIndex;
+    
+    // 禁用所有按钮
+    const btns = document.querySelectorAll('.option-btn');
+    btns.forEach(b => b.disabled = true);
+    
+    if (isCorrect) {
+        btnElement.classList.add('correct');
+        currentGame.score++;
+    } else {
+        btnElement.classList.add('wrong');
+        // 显示正确答案
+        btns[q.correctIndex].classList.add('correct');
+    }
+    
+    // 延迟进入下一题
+    setTimeout(() => {
+        currentGame.currentIndex++;
+        renderQuestion(currentGame.currentIndex);
+    }, 1000);
+}
+
+// 游戏结束
+function finishGame() {
+    currentGame.isOver = true;
+    document.getElementById('g-game-quiz').style.display = 'none';
+    document.getElementById('g-game-result').style.display = 'block';
+    
+    const isWin = currentGame.score === currentGame.questions.length;
+    
+    if (isWin) {
+        document.getElementById('g-result-success').style.display = 'block';
+        document.getElementById('g-result-fail').style.display = 'none';
+    } else {
+        document.getElementById('g-result-success').style.display = 'none';
+        document.getElementById('g-result-fail').style.display = 'block';
+    }
+}
+
+// 提交评论并解锁下一关
+async function submitCommentAndUnlock() {
+    const commentInput = document.getElementById('g-game-comment-input');
+    const content = commentInput.value.trim();
+    
+    if (!content) {
+        alert("请写下你的感言");
+        return;
+    }
+    
+    const building = currentGame.building;
+    
+    // 1. 提交评论
+    try {
+        const levelMap = {
+            1: 'ForbiddenCity',
+            2: 'TempleOfHeaven',
+            3: 'PotalaPalace',
+            4: 'YellowCraneTower',
+            5: 'GreatWall'
+        };
+        const levelId = levelMap[building.id];
+        
+        const formData = new FormData();
+        formData.append('level_id', levelId);
+        formData.append('content', content);
+        
+        await fetch('../backend/api/comment/addComment.php', {
+            method: 'POST',
+            body: formData
+        });
+        
+        // 2. 解锁下一关
+        unlockNextLevel(building.id);
+        
+        alert("恭喜！已解锁下一关！");
+        
+        // 重新渲染列表和地图
+        renderList();
+        renderLevelMap();
+        
+    } catch (e) {
+        console.error(e);
+        alert("提交失败，请重试");
+    }
+}
+
+// 解锁下一关逻辑
+function unlockNextLevel(currentId) {
+    const allBuildings = getBuildings();
+    const nextId = currentId + 1;
+    
+    const nextBuilding = allBuildings.find(b => b.id === nextId);
+    if (nextBuilding) {
+        // 如果已经解锁，则无需重复操作
+        if (nextBuilding.unlocked) {
+            return;
+        }
+        nextBuilding.unlocked = true;
+        
+        const newBuildings = allBuildings.map(b => {
+            if (b.id === nextId) return nextBuilding;
+            return b;
+        });
+        saveBuildings(newBuildings);
+        updateProgressToBackend(nextId, true);
+    }
+}
+
+// 绑定游戏相关事件
+document.addEventListener('DOMContentLoaded', () => {
+    const playBtn = document.getElementById('play-btn');
+    if (playBtn) {
+        playBtn.addEventListener('click', startGame);
+    }
+    
+    // 移除旧的模态框事件绑定，因为我们现在动态生成UI
+});
+

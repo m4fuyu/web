@@ -1,4 +1,8 @@
 <?php
+// 禁止 PHP 输出错误信息到页面，防止破坏 JSON 格式
+error_reporting(0);
+ini_set('display_errors', 0);
+
 // 引入数据库配置
 require_once(__DIR__ . '/connectvars.php');
 
@@ -23,7 +27,9 @@ function sendResponse($status, $message, $data = null, $redirect = null) {
 // ==================== 数据库连接辅助函数 ====================
 
 function getDbConnection() {
-    $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+    // 检查是否定义了端口，如果没有则使用默认端口
+    $port = defined('DB_PORT') ? DB_PORT : 3306;
+    $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, $port);
     if (!$conn) {
         sendResponse('error', '数据库连接失败: ' . mysqli_connect_error());
     }
