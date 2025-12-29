@@ -26,14 +26,16 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 DROP TABLE IF EXISTS `userAccount`;
 CREATE TABLE `userAccount` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `ForbiddenCity` BOOLEAN DEFAULT TRUE COMMENT '紫禁城',
-  `GreatWall` BOOLEAN DEFAULT FALSE COMMENT '长城',
-  `TempleOfHeaven` BOOLEAN DEFAULT FALSE COMMENT '天坛',
-  `YellowCraneTower` BOOLEAN DEFAULT FALSE COMMENT '黄鹤楼',
-  `PotalaPalace` BOOLEAN DEFAULT FALSE COMMENT '布达拉宫',
-  PRIMARY KEY (`username`)
+  `password` varchar(50) NOT NULL,
+  `ForbiddenCity` BOOL DEFAULT TRUE COMMENT '紫禁城',
+  `GreatWall` BOOL DEFAULT FALSE COMMENT '长城',
+  `TempleOfHeaven` BOOL DEFAULT FALSE COMMENT '天坛',
+  `YellowCraneTower` BOOL DEFAULT FALSE COMMENT '黄鹤楼',
+  `PotalaPalace` BOOL DEFAULT FALSE COMMENT '布达拉宫',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_userAccount_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -41,28 +43,31 @@ CREATE TABLE `userAccount` (
 -- ----------------------------
 DROP TABLE IF EXISTS `adminAccount`;
 CREATE TABLE `adminAccount` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '管理员ID',
   `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `ForbiddenCity` BOOLEAN DEFAULT TRUE COMMENT '紫禁城',
-  `GreatWall` BOOLEAN DEFAULT FALSE COMMENT '长城',
-  `TempleOfHeaven` BOOLEAN DEFAULT FALSE COMMENT '天坛',
-  `YellowCraneTower` BOOLEAN DEFAULT FALSE COMMENT '黄鹤楼',
-  `PotalaPalace` BOOLEAN DEFAULT FALSE COMMENT '布达拉宫',
-  PRIMARY KEY (`username`)
+  `password` varchar(50) NOT NULL,
+  `ForbiddenCity` BOOL DEFAULT TRUE COMMENT '紫禁城',
+  `GreatWall` BOOL DEFAULT FALSE COMMENT '长城',
+  `TempleOfHeaven` BOOL DEFAULT FALSE COMMENT '天坛',
+  `YellowCraneTower` BOOL DEFAULT FALSE COMMENT '黄鹤楼',
+  `PotalaPalace` BOOL DEFAULT FALSE COMMENT '布达拉宫',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_adminAccount_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of `userAccount`
 -- ----------------------------
-INSERT INTO `userAccount` VALUES ('testuser', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
-INSERT INTO `userAccount` VALUES ('demo', 'demopass', TRUE, FALSE, FALSE, FALSE, FALSE);
-INSERT INTO `userAccount` VALUES ('user001', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
-INSERT INTO `userAccount` VALUES ('user002', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
-INSERT INTO `userAccount` VALUES ('zhangsan', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
-INSERT INTO `userAccount` VALUES ('lisi', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('1', 'lihua', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('2', 'wangwei', 'demopass', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('3', 'chenyu', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('4', 'zhaomin', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('5', 'zhangsan', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('6', 'lisi', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `userAccount` VALUES ('7', 'gaoyu', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
 
 -- ----------------------------
 -- Records of `adminAccount`
 -- ----------------------------
-INSERT INTO `adminAccount` VALUES ('admin', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
-INSERT INTO `adminAccount` VALUES ('admin2', '114514', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `adminAccount` VALUES ('1', 'admin', '123456', TRUE, FALSE, FALSE, FALSE, FALSE);
+INSERT INTO `adminAccount` VALUES ('2', 'admin2', '114514', TRUE, FALSE, FALSE, FALSE, FALSE);
