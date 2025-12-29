@@ -23,6 +23,13 @@ if (empty($content)) {
     sendResponse('error', '评论内容不能为空');
 }
 
+// 评论长度限制（与数据库 VARCHAR(20) 保持一致）
+$max_content_length = 20;
+$content_length = function_exists('mb_strlen') ? mb_strlen($content, 'UTF-8') : strlen($content);
+if ($content_length > $max_content_length) {
+    sendResponse('error', '评论内容不能超过' . $max_content_length . '个字符');
+}
+
 // 验证关卡ID是否有效
 if (!in_array($level_id, LEVEL_IDS)) {
     sendResponse('error', '无效的关卡ID');
