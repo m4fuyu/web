@@ -1,17 +1,14 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
+require_once __DIR__ . '/../ai_config.php';
+
 // ==========================================
 // 配置区域
 // ==========================================
-// 请将此处的 API KEY 替换为您在火山引擎申请的实际 API KEY
-$api_key = "b4636e66-f373-4a5c-825b-72d3ec4d7a36"; 
-
-// 模型 ID (根据您提供的范例)
-$model = "doubao-seed-1-6-251015"; 
-
-// API 地址
-$api_url = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
+$api_key = AI_API_KEY;
+$model = AI_MODEL_CHAT;
+$api_url = AI_API_URL;
 // ==========================================
 
 // 允许跨域 (开发环境方便调试)

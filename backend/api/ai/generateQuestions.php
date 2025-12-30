@@ -1,17 +1,14 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
+require_once __DIR__ . '/../ai_config.php';
+
 // ==========================================
 // 配置区域
 // ==========================================
-// 使用与 chat.php 相同的 API KEY (或者替换为您新的 Key)
-$api_key = "b4636e66-f373-4a5c-825b-72d3ec4d7a36"; 
-
-// 模型 ID (Doubao-1.6-flash)
-$model = "doubao-seed-1-6-flash-250828"; 
-
-// API 地址
-$api_url = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
+$api_key = AI_API_KEY;
+$model = AI_MODEL_GENERATION;
+$api_url = AI_API_URL;
 // ==========================================
 
 // 允许跨域
