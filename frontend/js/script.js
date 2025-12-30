@@ -2,6 +2,24 @@
  * 古代建筑成就 - 主逻辑 (jQuery版)
  */
 
+// 音效
+const sounds = {
+    click: new Audio('sound/click.mp3'),
+    success: new Audio('sound/success.mp3'),
+    correct: new Audio('sound/答对题.mp3'),
+    wrong: new Audio('sound/答错题.mp3'),
+    bgm: new Audio('sound/背景音乐.mp3')
+};
+sounds.bgm.loop = true;
+sounds.bgm.volume = 0.2;
+
+const playSound = name => {
+    if (sounds[name]) {
+        sounds[name].currentTime = 0;
+        sounds[name].play().catch(() => {});
+    }
+};
+
 // 建筑数据
 const buildings = [
     { id: 1, name: "紫禁城", description: "清两朝二十四位皇帝的皇宫。故宫始建于明成祖永乐四年（1406年），以南京故宫为蓝本营建，永乐十八年（1420年）落成。位于北京中轴线中心的故宫，占地面积72万平方米，建筑面积约15万平方米，有大小宫殿七十多座。房屋九千余间。是世界上现存规模最大、最完整的宫殿型建筑。", image: "../imgRes/紫禁城1.png", detailImage: "../imgRes/紫禁城2.png", unlocked: true },
@@ -63,16 +81,20 @@ function initHomePage() {
     initBarrage();
     renderList();
     
+    // 点击页面后播放背景音乐
+    $(document).one('click', () => sounds.bgm.play().catch(() => {}));
+    
     // 同步后端进度
     syncProgress().then(changed => changed && renderList());
     
     // 卡片点击
     $('#building-list').on('click', '.building-card:not(.locked)', function() {
+        playSound('click');
         location.href = `detail.html?id=${$(this).data('id')}`;
     });
     
     // 开始游戏
-    $('#play-btn').on('click', startGame);
+    $('#play-btn').on('click', function() { playSound('click'); startGame(); });
     
     // 重置进度
     $('#reset-btn').on('click', async function() {
@@ -233,7 +255,7 @@ function renderLevelMap() {
     layout.forEach(({ id, pos, name }) => {
         const b = data.find(x => x.id === id);
         const $node = $(`<div class="level-node ${pos} ${b?.unlocked ? 'unlocked' : 'locked'}"><div>${b?.unlocked ? name : '尚未解锁'}</div></div>`);
-        if (b?.unlocked) $node.on('click', () => enterLevel(b));
+        if (b?.unlocked) $node.on('click', () => { playSound('click'); enterLevel(b); });
         $c.append($node);
     });
     $('.game-area').html($c);
@@ -302,6 +324,7 @@ function renderQuestion(idx) {
     $('#g-options').off('click').on('click', '.option-btn', function() {
         if (currentGame.isOver) return;
         const i = $(this).data('idx'), correct = q.correctIndex === i;
+        playSound(correct ? 'correct' : 'wrong');
         $('.option-btn').prop('disabled', true);
         $(this).addClass(correct ? 'correct' : 'wrong');
         if (!correct) $(`.option-btn[data-idx="${q.correctIndex}"]`).addClass('correct');
@@ -315,6 +338,7 @@ function finishGame() {
     $('#g-quiz').hide();
     $('#g-result').show();
     const win = currentGame.score === currentGame.questions.length;
+    if (win) playSound('success');
     $(win ? '#g-success' : '#g-fail').show();
     $(win ? '#g-fail' : '#g-success').hide();
 }
